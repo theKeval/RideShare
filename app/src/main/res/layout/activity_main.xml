@@ -27,7 +27,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        android:text="Hello Rider,\nPlease enter From and To addresses below to search for available rides."
+        android:text="Hello akash,\nPlease enter From and To addresses below to search for available rides."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
