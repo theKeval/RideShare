@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_header"
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:background="@color/blue_primary"
@@ -30,7 +30,7 @@
         android:text="Hello Friend,\nPlease enter From and To addresses below to search for available rides."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_header" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input_from_address"
