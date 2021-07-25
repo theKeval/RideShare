@@ -2,8 +2,11 @@ package com.thekeval.rideshare.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.thekeval.rideshare.model.RiderModel;
 
@@ -21,6 +24,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String RIDER_ID = "rider_id";
     private static final String NAME = "name";
     private static final String PASSWORD = "password";
+    private static final String GENDER = "gender";
     private static final String EMAIL = "email";
     private static final String CONTACT_NO = "contact_no";
     // private static final String RIDE_OWNER = "ride_owner";
@@ -55,6 +59,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         RIDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                         NAME + " TEXT," +
                         PASSWORD + " TEXT," +
+                        GENDER + " TEXT," +
                         EMAIL + " TEXT," +
                         CONTACT_NO + " TEXT" +
                         // RIDE_OWNER + " INTEGER" +
@@ -112,13 +117,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(NAME, rider.name);
         contentValues.put(PASSWORD, rider.password);
+        contentValues.put(GENDER, rider.gender);
         contentValues.put(EMAIL, rider.email);
         contentValues.put(CONTACT_NO, rider.contact_no);
         // contentValues.put(RIDE_OWNER, rider.ride_owner);
 
-        long res = db.insert(TABLE_NAME_RIDER, null, contentValues);
-        return  (res != -1);
+        long response = 0;
+
+        try
+        {
+            response = db.insert(TABLE_NAME_RIDER, null, contentValues);
+        }
+        catch(SQLException e)
+        {
+            // checking for possible exceptions
+            Log.e("Exception","SQLException"+String.valueOf(e.getMessage()));
+            e.printStackTrace();
+        }
+
+        return  (response != -1);
     }
+
+    public RiderModel getRider(String email) {
+        String query = "SELECT * FROM " + TABLE_NAME_RIDER  + " WHERE "+ EMAIL +" LIKE '" + email + "'";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor res = db.rawQuery(query, null);
+        // res.moveToFirst();
+
+        RiderModel rider = null;
+        if (res.moveToFirst()) {
+            rider = new RiderModel(res.getString(1), res.getString(2), res.getString(3), res.getString(4), res.getString(5));
+        }
+
+        // res.close();
+        return rider;
+
+    }
+
 
 //    public booleanaddRide(RideModel ride) {
 //
@@ -133,22 +170,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        return (res != -1);
 //    }
 //
-//    public PlayerModel getPlayer(String name) {
-//        String query = "SELECT * FROM " + TABLE_NAME  + " WHERE name like '" + name + "'";
-//
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor res = db.rawQuery(query, null);
-//        // res.moveToFirst();
-//
-//        PlayerModel player = null;
-//        if (res.moveToFirst()) {
-//            player = new PlayerModel(res.getString(0), res.getString(1), res.getInt(2));
-//        }
-//
-//        // res.close();
-//        return player;
-//
-//    }
+
 //
 //    public ArrayList<PlayerModel> getTop3Players() {
 //        ArrayList<PlayerModel> top3Players = new ArrayList<>();
