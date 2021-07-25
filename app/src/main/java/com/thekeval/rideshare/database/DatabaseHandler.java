@@ -1,8 +1,11 @@
 package com.thekeval.rideshare.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.thekeval.rideshare.model.RiderModel;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -11,23 +14,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "RideShareDB";
     private static final String TABLE_NAME_RIDER = "Riders";
     private static final String TABLE_NAME_RIDE = "Ride";
+    private static final String TABLE_NAME_RIDE_RIDER_RELATION = "Ride_Riders_Relation";
     private static final String TABLE_NAME_VEHICLE = "Vehicle";
 
     // Rider properties
+    private static final String RIDER_ID = "rider_id";
     private static final String NAME = "name";
     private static final String PASSWORD = "password";
     private static final String EMAIL = "email";
-    private static final String RIDER_ID = "rider_id";
-    private static final String RIDE_OWNER = "ride_owner";
     private static final String CONTACT_NO = "contact_no";
+    // private static final String RIDE_OWNER = "ride_owner";
 
     // Ride Properties
+    private static final String RIDE_ID = "ride_id";
     private static final String FROM_LOCATION = "from_location";
     private static final String DESTINATION_LOCATION = "destination_location";
     private static final String START_TIME = "start_time";
-    private static final String RIDE_DURATION = "ride_duration";
-    private static final String HAULTS_ALLOWED = "haults_allowed";
+    private static final String RIDE_DURATION_MINUTES = "ride_duration_minutes";
+    private static final String HALT_ALLOWED = "halt_allowed";
     private static final String RIDE_OWNER_ID = "ride_owner_id";    // this is rider id who is the owner of the ride - driver
+    private static final String AVAILABLE_SEATS = "available_seats";
+    private static final String IS_COMPLETE = "is_complete";
 
     // Vehicle Properties
     private static final String VIN = "vin";
@@ -45,27 +52,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String query_createTable_rider =
                 "CREATE TABLE " + TABLE_NAME_RIDER + " (" +
-                        RIDER_ID + " NUMBER," +
+                        RIDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                         NAME + " TEXT," +
                         PASSWORD + " TEXT," +
                         EMAIL + " TEXT," +
-                        CONTACT_NO + " TEXT," +
-                        RIDE_OWNER + " INTEGER" +
+                        CONTACT_NO + " TEXT" +
+                        // RIDE_OWNER + " INTEGER" +
                         ")";
 
         String query_createTable_ride =
                 "CREATE TABLE " + TABLE_NAME_RIDE + " (" +
+                        RIDE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                         FROM_LOCATION + " TEXT," +
                         DESTINATION_LOCATION + " TEXT," +
                         START_TIME + " DATETIME," +
-                        RIDE_DURATION + " TEXT," +
-                        HAULTS_ALLOWED + " INTEGER," +
-                        RIDE_OWNER_ID + " INTEGER" +
+                        RIDE_DURATION_MINUTES + " TEXT," +
+                        HALT_ALLOWED + " INTEGER," +
+                        RIDE_OWNER_ID + " INTEGER," +
+                        AVAILABLE_SEATS + " INTEGER," +
+                        IS_COMPLETE + " INTEGER" +
+                        ")";
+
+        String query_createTable_rideRider =
+                "CREATE TABLE " + TABLE_NAME_RIDE_RIDER_RELATION + " (" +
+                        RIDE_ID + " INTEGER," +
+                        RIDER_ID + " INTEGER" +
                         ")";
 
         String query_createTable_vehicle =
                 "CREATE TABLE " + TABLE_NAME_VEHICLE + " (" +
-                        VIN + " NUMBER," +
+                        VIN + " NUMBER PRIMARY KEY NOT NULL," +
                         MANUFACTURER + " TEXT," +
                         MODEL + " TEXT," +
                         MANUFACTURING_YEAR + " TEXT," +
@@ -74,6 +90,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL(query_createTable_rider);
         db.execSQL(query_createTable_ride);
+        db.execSQL(query_createTable_rideRider);
         db.execSQL(query_createTable_vehicle);
 
     }
@@ -90,15 +107,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-//    public boolean addRider(RiderModel rider) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(NAME, rider.name);
-//        contentValues.put(PASSWORD, rider.password);
-//        contentValues.put(SCORE, player.highestScore);
-//        long res = db.insert(TABLE_NAME, null, contentValues);
-//        return  (res != -1);
-//    }
+    public boolean addRider(RiderModel rider) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NAME, rider.name);
+        contentValues.put(PASSWORD, rider.password);
+        contentValues.put(EMAIL, rider.email);
+        contentValues.put(CONTACT_NO, rider.contact_no);
+        // contentValues.put(RIDE_OWNER, rider.ride_owner);
+
+        long res = db.insert(TABLE_NAME_RIDER, null, contentValues);
+        return  (res != -1);
+    }
 
 //    public booleanaddRide(RideModel ride) {
 //
