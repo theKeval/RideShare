@@ -52,7 +52,7 @@
             android:layout_height="70dp"
             android:layout_margin="7dp"
             android:background="@android:drawable/editbox_background"
-            android:hint="From Address"
+            android:hint="From"
             android:inputType="textPostalAddress"
             android:singleLine="true"
             android:textSize="18sp" />
@@ -79,7 +79,7 @@
             android:layout_height="70dp"
             android:layout_margin="7dp"
             android:background="@android:drawable/editbox_background"
-            android:hint="To Address"
+            android:hint="To"
             android:inputType="textPostalAddress"
             android:singleLine="true"
             android:textSize="18sp" />
@@ -114,7 +114,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnSearchRide"
         android:layout_width="150dp"
         android:layout_height="60dp"
         android:layout_marginTop="32dp"
@@ -136,6 +136,6 @@
         android:text="NOTE:- There will be option to select the address for both To and From locations on the map."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/btnSearchRide" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
