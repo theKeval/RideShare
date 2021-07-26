@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.thekeval.rideshare.databinding.ActivityLocationSelectorBinding;
 
@@ -33,6 +35,8 @@ public class LocationSelectorActivity extends FragmentActivity implements OnMapR
     LatLng lat_and_lng;
     LocationListener loc_listener;
     Geocoder geocoder;
+    Marker marker;
+    String source = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,23 +45,28 @@ public class LocationSelectorActivity extends FragmentActivity implements OnMapR
         binding = ActivityLocationSelectorBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            source = extras.getString("source");
+        }
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         loc_man = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         loc_listener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                lat_and_lng = new LatLng(location.getLatitude(), location.getLongitude());
-
-                if (mMap != null) {
-                    mMap.clear();
-                    mMap.addMarker(new MarkerOptions().position(lat_and_lng).title("Your Current Location"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_and_lng, 15.0F));
+                if (marker == null) {
+                    lat_and_lng = new LatLng(location.getLatitude(), location.getLongitude());
+                    if (mMap != null) {
+                        drawMarker(lat_and_lng);
+                    }
                 }
-
             }
 
             @Override
@@ -75,6 +84,13 @@ public class LocationSelectorActivity extends FragmentActivity implements OnMapR
 
             }
         };
+
+    }
+
+    private void drawMarker(LatLng point) {
+        mMap.clear();
+        marker = mMap.addMarker(new MarkerOptions().position(point).title("Selected Location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15.0F));
     }
 
     /**
@@ -90,6 +106,35 @@ public class LocationSelectorActivity extends FragmentActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng point) {
+                Log.d("Map","Map clicked");
+                // double latitude = point.latitude;
+                // double longitude = point.longitude;
+                // locationTextView.setText(getCompleteAdressString(latitude,longitude ));
+
+                drawMarker(point);
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Intent mainIntent = new Intent(LocationSelectorActivity.this, MainActivity.class);
+                mainIntent.putExtra("lat", marker.getPosition().latitude);
+                mainIntent.putExtra("lng", marker.getPosition().longitude);
+                mainIntent.putExtra("source", source);
+                // setResult(RESULT_OK, mainIntent);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(mainIntent);
+                finish();
+
+                return false;
+            }
+        });
+
         // if the permission is granted, we request the update and if the permission is not granted, we request permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
@@ -103,18 +148,13 @@ public class LocationSelectorActivity extends FragmentActivity implements OnMapR
             }
         }
 
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     private void updateLocation(Location location) {
         Log.i(TAG, "updateLocation: " + location);
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(latLng).title("You are here"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 8.0F));
+        drawMarker(latLng);
     }
 
     @Override
@@ -137,5 +177,7 @@ public class LocationSelectorActivity extends FragmentActivity implements OnMapR
             Log.d(TAG, "startListening: ");
         }
     }
+
+
 
 }

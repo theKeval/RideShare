@@ -35,6 +35,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DESTINATION_LOCATION = "destination_location";
     private static final String START_TIME = "start_time";
     private static final String RIDE_DURATION_MINUTES = "ride_duration_minutes";
+    private static final String RIDE_FARE = "ride_fare";
     private static final String HALT_ALLOWED = "halt_allowed";
     private static final String RIDE_OWNER_ID = "ride_owner_id";    // this is rider id who is the owner of the ride - driver
     private static final String AVAILABLE_SEATS = "available_seats";
@@ -72,6 +73,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         DESTINATION_LOCATION + " TEXT," +
                         START_TIME + " DATETIME," +
                         RIDE_DURATION_MINUTES + " TEXT," +
+                        RIDE_FARE + " TEXT," +
                         HALT_ALLOWED + " INTEGER," +
                         RIDE_OWNER_ID + " INTEGER," +
                         AVAILABLE_SEATS + " INTEGER," +

@@ -1,5 +1,6 @@
 package com.thekeval.rideshare;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -9,6 +10,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Geocoder geocoder;
     private LatLng fromLatLng, toLatLng;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,21 @@ public class MainActivity extends AppCompatActivity {
         // initialization & default setting
         geocoder = new Geocoder(this);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            double lat = extras.getDouble("lat");
+            double lng = extras.getDouble("lng");
+
+            String source = extras.getString("source");
+            if (source.equalsIgnoreCase("from")) {
+                etFrom.setText(getCompleteAddressString(lat, lng));
+            }
+            else if (source.equalsIgnoreCase("to")) {
+                etTo.setText(getCompleteAddressString(lat, lng));
+            }
+        }
+
+
         // OnClick events
         btnSetDateTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,14 +80,24 @@ public class MainActivity extends AppCompatActivity {
         btnMapSelector_from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                navigateToMapActivity();
+                Intent mapIntent = new Intent(MainActivity.this, LocationSelectorActivity.class);
+                mapIntent.putExtra("source", "from");
+                startActivity(mapIntent);
+                // startActivityForResult(mapIntent, 1);
+
+                finish();
             }
         });
 
         btnMapSelector_to.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                navigateToMapActivity();
+                Intent mapIntent = new Intent(MainActivity.this, LocationSelectorActivity.class);
+                mapIntent.putExtra("source", "to");
+                startActivity(mapIntent);
+                // startActivityForResult(mapIntent, 2);
+
+                finish();
             }
         });
 
@@ -107,10 +135,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void navigateToMapActivity() {
-        Intent mapIntent = new Intent(MainActivity.this, LocationSelectorActivity.class);
-        startActivity(mapIntent);
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK) {
+//
+//            Bundle extras = data.getExtras();
+//            double lat = 0;
+//            double lng = 0;
+//            if (extras != null) {
+//                lat = extras.getDouble("lat");
+//                lng = extras.getDouble("lng");
+//            }
+//
+//            if (requestCode == 1) {
+//                etFrom.setText(getCompleteAddressString(lat, lng));
+//            }
+//            else if (requestCode == 2) {
+//                etTo.setText(getCompleteAddressString(lat, lng));
+//            }
+//        }
+//    }
 
     private void datePicker(){
         final Calendar calendar = Calendar.getInstance();
@@ -153,6 +198,43 @@ public class MainActivity extends AppCompatActivity {
 
         // timePickerDialog.setMin(hour + 1, minute);
         timePickerDialog.show();
+    }
+
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+
+        String strAdd = "";
+
+        // Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE,
+                    LONGITUDE, 1);
+
+            if (addresses != null && addresses.size() > 0) {
+
+                Address returnedAddress = addresses.get(0);
+
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+
+                    strReturnedAddress
+                            .append(returnedAddress.getAddressLine(i)).append(
+                            ",");
+                }
+
+                strAdd = strReturnedAddress.toString();
+
+                Log.w(TAG, "" + strReturnedAddress.toString());
+            } else {
+                Log.w(TAG, "No Address returned!");
+                strAdd = String.format("%.5g%n", LATITUDE) + ", " + String.format("%.5g%n", LONGITUDE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.w(TAG, "Cannot get Address!");
+        }
+        return strAdd;
     }
 
 
