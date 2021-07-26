@@ -126,6 +126,10 @@ public class MainActivity extends AppCompatActivity {
                         toLatLng = new LatLng(address.getLatitude(), address.getLongitude());
                     }
 
+                    Intent rideListIntent = new Intent(MainActivity.this, RideListActivity.class);
+                    startActivity(rideListIntent);
+                    finish();
+
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -237,5 +241,10 @@ public class MainActivity extends AppCompatActivity {
         return strAdd;
     }
 
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();
 
+        finish();
+    }
 }
