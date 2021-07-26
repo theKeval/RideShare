@@ -146,7 +146,9 @@ public class SignupActivity extends AppCompatActivity {
                 editor.apply();
 
                 Intent mainIntent = new Intent(SignupActivity.this, MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(mainIntent);
+                finish();
 
                 etFirstname.setText("");
                 etLastName.setText("");
